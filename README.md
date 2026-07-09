@@ -56,3 +56,21 @@ Based on the execution of the primary analytics pipeline, the following baseline
 * **Category D (Technical Paramedical):** Avg: $606,611 | Gross Base Allocation: $6,066,110
 * **Category E (Administrative Staff):** Avg: $559,903 | Gross Base Allocation: $33,034,269
 * **Category F (Drivers/Service/Auxiliary Staff):** Avg: $489,399 | Gross Base Allocation: $6,362,188
+
+### ⚠️ Deep Retirement Risk Profiles
+A targeted breakdown of the 37 retirement-eligible members reveals distinct risk hotspots:
+
+#### Risk Concentration by APS Category (Law 19.378)
+* **Category C (Technicians):** 16 members (Highest volume risk)
+* **Category B (Health Professionals):** 7 members (High financial/specialty risk)
+* **Category F (Service/Drivers):** 5 members (Logistical infrastructure risk)
+* **Category E (Paramedical Auxiliaries):** 4 members
+* **Category A (Physicians/Dentists):** 3 members
+* **Category D (Administrative Staff):** 1 member
+
+#### Top Operational Impact Zones (Pending Vacancies)
+1. **TECNICO DE ENFERMERIA (TENS):** 9 pending vacancies (Critical baseline care risk)
+2. **ADMINISTRATIVO:** 5 pending vacancies
+3. **AUXILIAR DE SERVICIOS:** 4 pending vacancies
+4. **TECNICO DENTAL:** 4 pending vacancies
+5. **MATRONA (Midwife):** 3 pending vacancies
