@@ -1,6 +1,12 @@
 import os
 from src.data_cleaning import clean_and_translate_data
-from src.analysis_utils import load_clean_data, calculate_demographics, calculate_contract_metrics, calculate_financial_insights
+from src.analysis_utils import (
+    load_clean_data, 
+    calculate_demographics, 
+    calculate_contract_metrics, 
+    calculate_financial_insights,
+    calculate_retirement_risk
+)
 
 def main():
     print("=============================================")
@@ -21,15 +27,35 @@ def main():
     print("=== Running Phase 2: Statistical Extraction ===")
     df = load_clean_data(PROCESSED_PATH)
     
+    # DEBUG LINE: Check exact unique strings inside the gender column
+    print(f"\n--- DEBUG DATA CHK ---")
+    print(f"Unique values in gender column: {df['gender'].value_counts().to_dict()}")
+    print(f"----------------------\n")
+    
     demo = calculate_demographics(df)
     contracts = calculate_contract_metrics(df)
     financials = calculate_financial_insights(df)
-    
+    retirement = calculate_retirement_risk(df)
+
     # 3. Print Results to Terminal
-    print(f"\n[DEMOGRAPHICS]")
+    print(f"[DEMOGRAPHICS]")
     print(f"• Total Active Staff: {demo['total_staff']}")
     print(f"• Average Age: {demo['average_age']:.1f} years old")
     print(f"• Average Experience (Tenure): {demo['average_tenure']:.1f} years")
+    
+    print(f"\n[⚠️ RETIREMENT RISK ANALYSIS]")
+    print(f"• Staff At/Past Retirement Age: {retirement['total_eligible']} members ({retirement['percentage_of_workforce']:.1f}% of workforce)")
+    if retirement['total_eligible'] > 0:
+        print(f"  - Average Age of Retiring Staff: {retirement['average_age']:.1f} years old")
+        print(f"  - Average Base Salary of Retiring Staff: ${retirement['average_salary']:,.0f}")
+        
+        print(f"\n  --- Risk Concentration by Law 19.378 Category ---")
+        for cat, count in retirement['category_breakdown'].items():
+            print(f"  • Category {cat}: {count} members eligible")
+            
+        print(f"\n  --- Top Retiring Job Functions (Impact Zones) ---")
+        for role, count in retirement['role_breakdown'].items():
+            print(f"  • {role}: {count} vacancies pending")
     
     print(f"\n[CONTRACTS & HOURS]")
     print(f"• Total Budgeted Weekly Hours: {contracts['total_weekly_hours']} hrs")
