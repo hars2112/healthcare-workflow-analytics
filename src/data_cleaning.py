@@ -2,12 +2,7 @@ import os
 import pandas as pd
 
 def clean_and_translate_data(file_path):
-    """
-    Loads the CESFAM raw Excel file, standardizes columns to English,
-    performs initial data cleansing, and saves a processed version.
-    """
     print(f"=== Loading raw data from: {file_path} ===")
-    
     try:
         df = pd.read_excel(file_path, engine='openpyxl')
         print(f"✔ Successfully loaded {df.shape[0]} rows.")
@@ -15,11 +10,9 @@ def clean_and_translate_data(file_path):
         print(f"❌ Error loading file: {e}")
         return None
 
-    # CRITICAL FIX: Clean the raw Excel column headers first!
-    # This removes invisible spaces like 'Fec.Nacimiento ' -> 'Fec.Nacimiento'
+    # Clean raw column headers
     df.columns = df.columns.astype(str).str.strip()
 
-    # Define the Spanish-to-English column mapping
     column_mapping = {
         'ID_RC': 'staff_id',
         'Tipo Contrato': 'contract_type',
@@ -44,23 +37,25 @@ def clean_and_translate_data(file_path):
         'H_011 ASIG.ATENCION PRIMARIA': 'primary_care_allowance'
     }
 
-    # Filter out columns we don't want and rename them
     existing_cols = [col for col in column_mapping.keys() if col in df.columns]
-    
-    # Quick sanity check print to help us see what matched
-    print(f"✔ Matched {len(existing_cols)} out of {len(column_mapping)} expected columns.")
-    
     df_clean = df[existing_cols].rename(columns=column_mapping)
 
     print("=== Cleaning data types & strings ===")
-    
-    # Only clean strings if the column actually exists now
+
+    # String cleaning
     string_cols = ['contract_type', 'staff_group', 'cost_center_name', 'gender', 'category', 'area', 'job_role', 'specific_role']
     for col in string_cols:
         if col in df_clean.columns:
             df_clean[col] = df_clean[col].astype(str).str.strip().str.upper()
 
-    # Parse dates safely if they exist
+    # Financial conversion: Remove commas and cast to numeric float
+    financial_cols = ['base_salary', 'primary_care_allowance']
+    for col in financial_cols:
+        if col in df_clean.columns:
+            df_clean[col] = df_clean[col].astype(str).str.replace(',', '', regex=False)
+            df_clean[col] = pd.to_numeric(df_clean[col], errors='coerce').fillna(0.0)
+
+    # Date parsing & age calculations
     if 'birth_date' in df_clean.columns:
         df_clean['birth_date'] = pd.to_datetime(df_clean['birth_date'], errors='coerce')
         df_clean['age'] = 2026 - df_clean['birth_date'].dt.year
@@ -73,10 +68,13 @@ def clean_and_translate_data(file_path):
 
 if __name__ == "__main__":
     RAW_DATA_PATH = os.path.join("data", "raw", "healthcare_data.xlsx")
+    PROCESSED_DATA_PATH = os.path.join("data", "processed", "healthcare_clean.csv")
+    
     cleaned_df = clean_and_translate_data(RAW_DATA_PATH)
     
     if cleaned_df is not None:
-        print("\n=== Initial Diagnostic Data Check ===")
-        print(cleaned_df.info())
-        print("\n=== Missing Values Report ===")
-        print(cleaned_df.isnull().sum())
+        # Create processed folder if it doesn't exist yet
+        os.makedirs(os.path.dirname(PROCESSED_DATA_PATH), exist_ok=True)
+        # Export clean data
+        cleaned_df.to_csv(PROCESSED_DATA_PATH, index=False)
+        print(f"✔ Cleaned dataset successfully saved to: {PROCESSED_DATA_PATH}")

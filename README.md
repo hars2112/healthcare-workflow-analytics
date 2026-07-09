@@ -31,3 +31,28 @@ This analysis is designed to answer critical organizational questions for the he
 
 ### 4. Operational Role Insights
 * **Talent Density:** Identifying which specific job functions represent the highest personnel density and financial commitment within the clinic.
+
+## 📈 Initial Analytical Key Findings
+
+Based on the execution of the primary analytics pipeline, the following baseline organization metrics were extracted:
+
+### 1. Workforce Demographics & Core Stability
+* **Total Monitored Workforce:** 511 Active Professionals.
+* **Average Staff Age:** 42.3 Years Old.
+* **Average Institutional Tenure:** 10.5 Years of experience.
+
+### 2. Contractual Breakdown & Resource Loading
+* **Total Weekly Workforce Delivery:** 19,880 Contracted Hours/Week.
+* **Contractual Stability Split:**
+  - `INDEFINIDO` (Permanent Tenure): 276 Staff Members
+  - `PLAZO FIJO` (Fixed Term): 179 Staff Members
+  - `INDEFINIDO CT`: 41 Staff Members
+  - `REEMPLAZO` (Substitutes/Replacements): 15 Staff Members
+
+### 3. Financial Payroll Metrics (Base Salary by Law 19.378 Category)
+* **Category A (Medics/Dentists/Pharmacists):** Avg: $1,082,984 | Gross Base Allocation: $126,709,134
+* **Category B (Nurses and Other Health Professionals):** Avg: $1,001,882 | Gross Base Allocation: $128,240,909
+* **Category C (Technicians):** Avg: $628,595 | Gross Base Allocation: $89,889,065
+* **Category D (Technical Paramedical):** Avg: $606,611 | Gross Base Allocation: $6,066,110
+* **Category E (Administrative Staff):** Avg: $559,903 | Gross Base Allocation: $33,034,269
+* **Category F (Drivers/Service/Auxiliary Staff):** Avg: $489,399 | Gross Base Allocation: $6,362,188
