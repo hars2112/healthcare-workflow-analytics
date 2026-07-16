@@ -1,0 +1,12 @@
+# Data files (crucial for privacy)
+data/
+*.xlsx
+*.csv
+Cheatsheet.md
+
+# Python enviroment & cache 
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+env/
