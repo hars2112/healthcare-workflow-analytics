@@ -1,5 +1,5 @@
 # 🏥 CareForce Horizon
-##A Predictive Analytics Pipeline & Financial Liability Model for Public Healthcare Workforce Volatility under Law 19.378
+## A Predictive Analytics Pipeline & Financial Liability Model for Public Healthcare Workforce Volatility under Law 19.378
 
 An enterprise-grade, modular data engineering and predictive analytics pipeline built to ingest, clean, and forecast workforce transition dynamics and financial liabilities under the Chilean Primary Care Statute (**Law 19.378**). 
 
