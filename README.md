@@ -1,76 +1,61 @@
-## Project Progress Log
+# 🏥 CareForce Horizon
+##A Predictive Analytics Pipeline & Financial Liability Model for Public Healthcare Workforce Volatility under Law 19.378
 
-### Phase 1: Data Ingestion & Cleansing (Completed)
-- **Status:** Done.
-- **Data Privacy & Anonymization Precautions:**
-  - Fully anonymized the dataset prior to processing to comply with data privacy standards.
-  - Stripped out all compromise-prone personal identifying information (PII) such as full names, real national registry IDs (RUT), and email addresses.
-  - Replaced sensitive fields with dummy/masked attributes (`staff_id`) to ensure absolute confidentiality.
-- **Technical Actions Taken:**
-  - Standardized 21 public health workforce columns from Spanish to English.
-  - Stripped white spaces from text features to prevent syntax errors.
-  - Parsed financial columns (`base_salary`, `primary_care_allowance`) from text strings into floats for analytical math.
-  - Engineered two dynamic numerical variables: `age` and `tenure_years`.
-  - Saved the structured, fully cleaned dataset to `data/processed/healthcare_clean.csv`.
+An enterprise-grade, modular data engineering and predictive analytics pipeline built to ingest, clean, and forecast workforce transition dynamics and financial liabilities under the Chilean Primary Care Statute (**Law 19.378**). 
 
-## Expected Outcomes & Analytical Focus
+This system processes clinical staff data to identify immediate operational risks and projects cumulative staffing gaps and retirement liabilities 5 and 10 years into the future, assuming an annual compounding salary growth rate of **5.4%**.
 
-This analysis is designed to answer critical organizational questions for the healthcare center's management team, focusing on four primary pillars:
+---
 
-### 1. Workforce Demographics
-* **Age & Generational Distribution:** Identifying the average age of the staff and checking for upcoming retirement risks.
-* **Gender Balance:** Evaluating representation across different organizational units.
+## 🏗️ System Architecture & Data Flow
 
-### 2. Contractual & Workload Structure
-* **Contract Type Splits:** Measuring the ratio of fixed-term contracts (`PLAZO FIJO`) vs. permanent tenure staff (`PLANTA`).
-* **Resource Allocation:** Analyzing how weekly hours (`contract_hours`) are distributed across various center roles.
+The pipeline is designed with a professional, modular structure split into three distinct phases:
 
-### 3. Salary & Compensation Framework
-* **Payroll Optimization:** Mapping the distribution of the `base_salary` and `primary_care_allowance` across clinical categories (Categories A through F under Law 19.378).
-* **Tenure vs. Pay:** Visualizing how operational costs scale alongside staff experience levels (`step_level` and `tenure_years`).
+1. **Phase 1: Ingestion & Data Sanitation (`src/data_cleaning.py`)**
+   - Automatically sanitizes and maps localized Spanish fields to standard database schemas.
+   - Converts financial values into clean numeric floats, resolving text format anomalies.
+   - Programmatically calculates exact employee `age` and institutional `tenure_years` based on date parameters.
+   - Doubles the raw base salary column to represent the **true gross monthly baseline earnings** (accounting for duplicate payroll structures).
+   
+2. **Phase 2: Predictive Analytical Engine (`src/analysis_utils.py` & `src/liability_calculator.py`)**
+   - **Demographic Baselines:** Extracts workforce age averages, stability markers, and tenure indicators.
+   - **Gender-Aligned Retirement Modeling:** Evaluates retirement eligibility mapped directly to Chilean standard legal thresholds (Women $\ge$ 60, Men $\ge$ 65).
+   - **Decade-Out Compound Forecasting:** Projects workforce age shifts and compounded salary growth ($S_t = S_0 \times (1 + 0.054)^t$) over 5 and 10-year horizons.
+   - **Deterministic Liability Calculator:** Projects total severance liabilities capped at a maximum of 11 months of gross salary (1 month per year of service).
 
-### 4. Operational Role Insights
-* **Talent Density:** Identifying which specific job functions represent the highest personnel density and financial commitment within the clinic.
+3. **Phase 3: Pipeline Orchestration (`main.py`)**
+   - Serves as the central pipeline controller, sequentially running the ETL cleaning process, running statistical calculations, and generating executive console reports in **CLP**.
 
-## 📈 Initial Analytical Key Findings
+---
 
-Based on the execution of the primary analytics pipeline, the following baseline organization metrics were extracted:
+## 📊 Key Executive Findings & Forecasts
 
-### 1. Workforce Demographics & Core Stability
-* **Total Monitored Workforce:** 511 Active Professionals.
-* **Average Staff Age:** 42.3 Years Old.
-* **Average Institutional Tenure:** 10.5 Years of experience.
+Executing the master pipeline against the workforce dataset of **511 active professionals** yielded the following strategic insights:
 
-### 2. Contractual Breakdown & Resource Loading
-* **Total Weekly Workforce Delivery:** 19,880 Contracted Hours/Week.
-* **Contractual Stability Split:**
-  - `INDEFINIDO` (Permanent Tenure): 276 Staff Members
-  - `PLAZO FIJO` (Fixed Term): 179 Staff Members
-  - `INDEFINIDO CT`: 41 Staff Members
-  - `REEMPLAZO` (Substitutes/Replacements): 15 Staff Members
+### 1. Demographic & Stability Baseline
+* **Total Active Workforce:** 511 Employees
+* **Average Age:** 42.3 Years Old
+* **Average Experience (Tenure):** 10.5 Years
+* **Workforce Hours Load:** 19,880 Weekly Hours Contracted
 
-### 3. Financial Payroll Metrics (Base Salary by Law 19.378 Category)
-* **Category A (Medics/Dentists/Pharmacists):** Avg: $1,082,984 | Gross Base Allocation: $126,709,134
-* **Category B (Nurses and Other Health Professionals):** Avg: $1,001,882 | Gross Base Allocation: $128,240,909
-* **Category C (Technicians):** Avg: $628,595 | Gross Base Allocation: $89,889,065
-* **Category D (Technical Paramedical):** Avg: $606,611 | Gross Base Allocation: $6,066,110
-* **Category E (Administrative Staff):** Avg: $559,903 | Gross Base Allocation: $33,034,269
-* **Category F (Drivers/Service/Auxiliary Staff):** Avg: $489,399 | Gross Base Allocation: $6,362,188
+### 2. Fiscal Liability & Retirement Forecast Timeline (CLP)
 
-### ⚠️ Deep Retirement Risk Profiles
-A targeted breakdown of the 37 retirement-eligible members reveals distinct risk hotspots:
+| Timeline | Eligible Staff Count | % of Total Workforce | Estimated Cumulative Liability (CLP) | Average Individual Payout (CLP) |
+| :--- | :---: | :---: | :---: | :---: |
+| **Year 0 (Today)** | 37 members | 7.2% | **705,657,844 CLP** | 19,071,834 CLP |
+| **Year 5 (Future)** | 76 members | 14.9% | **1,978,531,578 CLP** | 26,033,310 CLP |
+| **Year 10 (Future)** | 126 members | 24.7% | **4,313,433,983 CLP** | 34,233,603 CLP |
 
-#### Risk Concentration by APS Category (Law 19.378)
-* **Category C (Technicians):** 16 members (Highest volume risk)
-* **Category B (Health Professionals):** 7 members (High financial/specialty risk)
-* **Category F (Service/Drivers):** 5 members (Logistical infrastructure risk)
-* **Category E (Paramedical Auxiliaries):** 4 members
-* **Category A (Physicians/Dentists):** 3 members
-* **Category D (Administrative Staff):** 1 member
+### 3. Immediate Operational Vulnerability Hotspots (Year 0)
+The pipeline isolates **Category C** (Nursing Technicians - TENS) and **Category B** (Midwives, Nurses) as the highest risk sectors for upcoming vacancies:
+* **Category C (Technicians):** 16 members currently eligible (Led by **TÉCNICO DE ENFERMERÍA** with 9 vacancies pending).
+* **Category B (Health Professionals):** 7 members currently eligible (Led by **MATRONA** with 3 vacancies pending).
 
-#### Top Operational Impact Zones (Pending Vacancies)
-1. **TECNICO DE ENFERMERIA (TENS):** 9 pending vacancies (Critical baseline care risk)
-2. **ADMINISTRATIVO:** 5 pending vacancies
-3. **AUXILIAR DE SERVICIOS:** 4 pending vacancies
-4. **TECNICO DENTAL:** 4 pending vacancies
-5. **MATRONA (Midwife):** 3 pending vacancies
+---
+
+## 🏛️ Strategic Decisions Assisted by This Pipeline
+
+This pipeline serves as a decision-making framework for a CESFAM Director to execute:
+1. **Targeted Succession Planning:** Initiate proactive recruiting for the 9 pending TENS vacancies to prevent operational care bottlenecks.
+2. **Financial Reserves Provisioning:** Leverage the 10-year liability forecast to request regional budget allocations (*Incentivo al Retiro*) early, mitigating the impending **4.3 Billion CLP** liability.
+3. **Logistics Risk Management:** Identify vehicle operators (Category F) approaching retirement to preserve critical community outreach programs.
