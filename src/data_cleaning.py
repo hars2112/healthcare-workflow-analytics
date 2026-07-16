@@ -48,12 +48,16 @@ def clean_and_translate_data(file_path):
         if col in df_clean.columns:
             df_clean[col] = df_clean[col].astype(str).str.strip().str.upper()
 
-    # Financial conversion: Remove commas and cast to numeric float
+    # Financial conversion: Remove commas, cast to float, and double the base salary (as it is duplicated)
     financial_cols = ['base_salary', 'primary_care_allowance']
     for col in financial_cols:
         if col in df_clean.columns:
             df_clean[col] = df_clean[col].astype(str).str.replace(',', '', regex=False)
             df_clean[col] = pd.to_numeric(df_clean[col], errors='coerce').fillna(0.0)
+    
+    # Apply the 2x gross baseline multiplier to base_salary
+    if 'base_salary' in df_clean.columns:
+        df_clean['base_salary'] = df_clean['base_salary'] * 2
 
     # Date parsing & age calculations
     if 'birth_date' in df_clean.columns:
@@ -73,8 +77,6 @@ if __name__ == "__main__":
     cleaned_df = clean_and_translate_data(RAW_DATA_PATH)
     
     if cleaned_df is not None:
-        # Create processed folder if it doesn't exist yet
         os.makedirs(os.path.dirname(PROCESSED_DATA_PATH), exist_ok=True)
-        # Export clean data
         cleaned_df.to_csv(PROCESSED_DATA_PATH, index=False)
         print(f"✔ Cleaned dataset successfully saved to: {PROCESSED_DATA_PATH}")

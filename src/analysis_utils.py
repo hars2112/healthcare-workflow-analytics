@@ -25,15 +25,11 @@ def calculate_contract_metrics(df):
 
 def calculate_financial_insights(df):
     """Aggregates salary allocations by clinical category."""
-    # Group by category and calculate total and mean base salary
     category_payroll = df.groupby('category')['base_salary'].agg(['sum', 'mean']).round(2)
     return category_payroll.to_dict(orient='index')
 
 def calculate_retirement_risk(df):
-    """
-    Calculates deep metrics for staff at or past retirement age 
-    (Women >= 60, Men >= 65), including risk concentration blocks.
-    """
+    """Calculates metrics for staff at or past retirement age."""
     is_female_retired = (df['gender'] == 'FEMENINO') & (df['age'] >= 60)
     is_male_retired = (df['gender'] == 'MASCULINO') & (df['age'] >= 65)
     
@@ -44,16 +40,11 @@ def calculate_retirement_risk(df):
         avg_age = retirement_df['age'].mean()
         avg_salary = retirement_df['base_salary'].mean()
         pct_of_workforce = (total_eligible / len(df)) * 100
-        
-        # New Feature: Count distribution within the retirement pool
         category_breakdown = retirement_df['category'].value_counts().to_dict()
-        role_breakdown = retirement_df['job_role'].value_counts().head(5).to_dict() # Top 5 critical roles
+        role_breakdown = retirement_df['job_role'].value_counts().head(5).to_dict()
     else:
-        avg_age = 0.0
-        avg_salary = 0.0
-        pct_of_workforce = 0.0
-        category_breakdown = {}
-        role_breakdown = {}
+        avg_age, avg_salary, pct_of_workforce = 0.0, 0.0, 0.0
+        category_breakdown, role_breakdown = {}, {}
         
     metrics = {
         'total_eligible': total_eligible,
@@ -64,3 +55,39 @@ def calculate_retirement_risk(df):
         'role_breakdown': role_breakdown
     }
     return metrics
+
+def calculate_retirement_projections(df):
+    """
+    Simulates workforce aging 5 and 10 years into the future.
+    Applies a compounding 5.4% annual salary growth rate.
+    """
+    projections = {}
+    growth_rate = 0.054
+    
+    for years_forward in [5, 10]:
+        future_age = df['age'] + years_forward
+        
+        is_female_retired = (df['gender'] == 'FEMENINO') & (future_age >= 60)
+        is_male_retired = (df['gender'] == 'MASCULINO') & (future_age >= 65)
+        
+        retired_df = df[is_female_retired | is_male_retired].copy()
+        total_eligible = len(retired_df)
+        pct_of_workforce = (total_eligible / len(df)) * 100
+        
+        if total_eligible > 0:
+            # Apply annual compounding growth: Salary * (1 + 0.054)^t
+            projected_salaries = retired_df['base_salary'] * ((1 + growth_rate) ** years_forward)
+            avg_salary = projected_salaries.mean()
+            category_breakdown = retired_df['category'].value_counts().to_dict()
+        else:
+            avg_salary = 0.0
+            category_breakdown = {}
+            
+        projections[years_forward] = {
+            'total_eligible': total_eligible,
+            'percentage_of_workforce': pct_of_workforce,
+            'average_salary': avg_salary,
+            'category_breakdown': category_breakdown
+        }
+        
+    return projections

@@ -5,7 +5,8 @@ from src.analysis_utils import (
     calculate_demographics, 
     calculate_contract_metrics, 
     calculate_financial_insights,
-    calculate_retirement_risk
+    calculate_retirement_risk,
+    calculate_retirement_projections
 )
 
 def main():
@@ -13,7 +14,6 @@ def main():
     print("   HEALTHCARE WORKFLOW ANALYTICS PIPELINE    ")
     print("=============================================\n")
     
-    # Define paths
     RAW_PATH = os.path.join("data", "raw", "healthcare_data.xlsx")
     PROCESSED_PATH = os.path.join("data", "processed", "healthcare_clean.csv")
     
@@ -27,44 +27,51 @@ def main():
     print("=== Running Phase 2: Statistical Extraction ===")
     df = load_clean_data(PROCESSED_PATH)
     
-    # DEBUG LINE: Check exact unique strings inside the gender column
-    print(f"\n--- DEBUG DATA CHK ---")
-    print(f"Unique values in gender column: {df['gender'].value_counts().to_dict()}")
-    print(f"----------------------\n")
-    
     demo = calculate_demographics(df)
     contracts = calculate_contract_metrics(df)
     financials = calculate_financial_insights(df)
     retirement = calculate_retirement_risk(df)
+    projections = calculate_retirement_projections(df)
 
-    # 3. Print Results to Terminal
-    print(f"[DEMOGRAPHICS]")
+    # Print Demographics
+    print(f"\n[DEMOGRAPHICS]")
     print(f"• Total Active Staff: {demo['total_staff']}")
     print(f"• Average Age: {demo['average_age']:.1f} years old")
     print(f"• Average Experience (Tenure): {demo['average_tenure']:.1f} years")
     
-    print(f"\n[⚠️ RETIREMENT RISK ANALYSIS]")
+    # Current Retirement Risk (Year 0)
+    print(f"\n[⚠️ CURRENT RETIREMENT RISK (YEAR 0)]")
     print(f"• Staff At/Past Retirement Age: {retirement['total_eligible']} members ({retirement['percentage_of_workforce']:.1f}% of workforce)")
     if retirement['total_eligible'] > 0:
         print(f"  - Average Age of Retiring Staff: {retirement['average_age']:.1f} years old")
-        print(f"  - Average Base Salary of Retiring Staff: ${retirement['average_salary']:,.0f}")
+        print(f"  - Average Base Salary: {retirement['average_salary']:,.0f} CLP")
         
-        print(f"\n  --- Risk Concentration by Law 19.378 Category ---")
+        print("\n  --- Risk Concentration by Law 19.378 Category ---")
         for cat, count in retirement['category_breakdown'].items():
             print(f"  • Category {cat}: {count} members eligible")
             
-        print(f"\n  --- Top Retiring Job Functions (Impact Zones) ---")
+        print("\n  --- Top Retiring Job Functions (Impact Zones) ---")
         for role, count in retirement['role_breakdown'].items():
             print(f"  • {role}: {count} vacancies pending")
-    
+        
+    # 5 & 10 Year Forecasts
+    print(f"\n[🔮 FUTURE RETIREMENT FORECASTS (CUMULATIVE with 5.4% Annual Growth)]")
+    for years, data in projections.items():
+        print(f"• In {years} Years:")
+        print(f"  - Cumulative Eligible Staff: {data['total_eligible']} members ({data['percentage_of_workforce']:.1f}% of total workforce)")
+        print(f"  - Projected Average Base Salary of Pool: {data['average_salary']:,.0f} CLP")
+        print(f"  - Category Breakdown of Pool: {data['category_breakdown']}")
+
+    # Contracts
     print(f"\n[CONTRACTS & HOURS]")
     print(f"• Total Budgeted Weekly Hours: {contracts['total_weekly_hours']} hrs")
     for c_type, count in contracts['contract_type_counts'].items():
         print(f"  - {c_type}: {count} staff members")
         
-    print(f"\n[FINANCIAL PAYROLL BY LAW 19.378 CATEGORY]")
+    # Financials
+    print(f"\n[FINANCIAL PAYROLL BY LAW 19.378 CATEGORY (Doubled Gross Baseline)]")
     for cat, data in financials.items():
-        print(f"• Category {cat} | Average Base Salary: ${data['mean']:,.0f} | Total Allocation: ${data['sum']:,.0f}")
+        print(f"• Category {cat} | Average Base Salary: {data['mean']:,.0f} CLP | Total Allocation: {data['sum']:,.0f} CLP")
 
 if __name__ == "__main__":
     main()
